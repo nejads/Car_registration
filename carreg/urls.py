@@ -15,9 +15,9 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 from django.contrib import admin
-from carreg_app import index
+from carreg_app.views import index
 
 urlpatterns = [
-    url(r'^$', index, name='index')
+    url(r'^$', index, name='index'),
     url(r'^admin/', include(admin.site.urls)),
 ]
