@@ -1,1 +1,1 @@
-web: gunicorn waap.wsgi --log-file -
+web: gunicorn carreg.wsgi --log-file -
