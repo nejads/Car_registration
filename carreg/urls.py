@@ -16,8 +16,11 @@ Including another URLconf
 from django.conf.urls import include, url
 from django.contrib import admin
 from carreg_app.views import index
+from rest_framework import routers, serializers, viewsets
 
 urlpatterns = [
     url(r'^$', index, name='index'),
     url(r'^admin/', include(admin.site.urls)),
+    url(r'^api-auth/', include('rest_framework.urls',
+        namespace='rest_framework')),
 ]
