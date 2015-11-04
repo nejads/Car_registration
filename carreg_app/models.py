@@ -3,13 +3,13 @@ from . import utils
 
 
 class User (models.Model):
-    tag_id = models.CharField(max_length=23, unique=True)
+    tag_id = models.CharField(unique=True)
     name = models.CharField(max_length=50)
     email = models.EmailField(max_length=254, unique=True)
     credential = models.OneToOneField('Credential')
     plate = models.CharField(max_length=30)
     bank = models.CharField(max_length=30)
-    tel = models.CharField(validators=[utils.validate_phone], max_length=23)
+    tel = models.CharField(max_length=23)
     registration_time = models.DateTimeField(auto_now_add=True)
     latest_modification = models.DateTimeField(auto_now=True)
 
