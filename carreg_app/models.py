@@ -8,14 +8,18 @@ from django.contrib.auth.models import (
 
 class UserManager(BaseUserManager):
     def create_user(self, name=None, email=None, password=None, plate=None,
-                    bank=None, tel=None):
+                    tag_id=None, bank=None, tel=None):
         if (not email) or (not name) or (not plate) or (not bank) or (not tel)
-        or (not password):
+        or (not password) or (not tag_id):
             raise ValueError('Some information missing')
 
         user = self.model(
             name=name,
             email=self.normalize_email(email),
+            plate=plate,
+            bank=bank,
+            tel=tel,
+            tag_id=tag_id,
         )
 
         user.set_password(password)
@@ -24,7 +28,7 @@ class UserManager(BaseUserManager):
 
     def create_superuser(self, first_name, email, password):
         user = self.create_user(
-            first_name,
+            name,
             email,
             password=password,
         )
@@ -33,32 +37,27 @@ class UserManager(BaseUserManager):
         return user
 
 
-class User (models.Model):
+class User (AbstractBaseUser):
     tag_id = models.CharField(max_length=50, unique=True)
     name = models.CharField(max_length=50)
     email = models.EmailField(max_length=254, unique=True)
-    credential = models.OneToOneField('Credential')
     plate = models.CharField(max_length=30)
     bank = models.CharField(max_length=30)
     tel = models.CharField(max_length=50)
-    registration_time = models.DateTimeField(auto_now_add=True)
-    latest_modification = models.DateTimeField(auto_now=True)
+    is_active = models.BooleanField(default=False)
+    is_admin = models.BooleanField(default=False)
+    date_joined = models.DateTimeField(auto_now_add=True)
+
+    objects = UserManager()
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['name', 'plate', 'bank', 'tel', 'tag_id']
 
     def __str__(self):
         return ('id: {} tag_id: {} name: {} email: {}'
-                'credential_id: {} plate: {} bank: {} tel: {}'
-                'registration_time: {} latest_modification: {}'.
+                'plate: {} bank: {} tel: {}'.
                 format(self.id, self.tag_id, self.name, self.email,
-                       self.credential.id, self.plate, self.bank, self.tel,
-                       self.registration_time, self.latest_modification))
-
-
-class Credential (models.Model):
-    encrypted_pass = models.CharField(max_length=128)
-    salt = models.CharField(max_length=50)
-
-    def __str__(self):
-        return ('id: {} salt: {}'.format(self.id, self.salt))
+                       self.plate, self.bank, self.tel))
 
 
 class Refuel (models.Model):

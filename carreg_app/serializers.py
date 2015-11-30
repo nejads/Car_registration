@@ -8,11 +8,6 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
 
 
-class CredentialSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Credential
-
-
 class SignUpSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
