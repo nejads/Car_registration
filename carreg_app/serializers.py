@@ -1,28 +1,30 @@
-from . import models
+from carreg_app.models import User, Credential, Refuel
 
 from rest_framework import serializers
 
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = models.User
-        fields = ('id', 'tag_id', 'name', 'email',
-                  'credential', 'plate', 'bank', 'tel')
+        model = User
 
 
 class CredentialSerializer(serializers.ModelSerializer):
     class Meta:
-        model = models.Credential
-        fields = ('id', 'encrypted_password', 'salt')
+        model = Credential
 
 
 class SignUpSerializer(serializers.ModelSerializer):
     class Meta:
-        model = models.User
+        model = User
         fields = ('name', 'email', 'plate', 'bank', 'tel')
+
+
+class GetRefuelInformationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Refuel
+        fields = ('tag_id', 'line', 'consumption')
 
 
 class RefuelSerializer(serializers.ModelSerializer):
     class Meta:
-        model = models.Refuel
-        fields = ('id', 'user', 'line', 'consumption', 'refuel_time')
+        model = Refuel

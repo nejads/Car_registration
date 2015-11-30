@@ -1,15 +1,46 @@
 from django.db import models
 from . import utils
+from django.contrib.auth.models import (
+    BaseUserManager,
+    AbstractBaseUser,
+)
+
+
+class UserManager(BaseUserManager):
+    def create_user(self, name=None, email=None, password=None, plate=None,
+                    bank=None, tel=None):
+        if (not email) or (not name) or (not plate) or (not bank) or (not tel)
+        or (not password):
+            raise ValueError('Some information missing')
+
+        user = self.model(
+            name=name,
+            email=self.normalize_email(email),
+        )
+
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, first_name, email, password):
+        user = self.create_user(
+            first_name,
+            email,
+            password=password,
+        )
+        user.is_admin = True
+        user.save(using=self._db)
+        return user
 
 
 class User (models.Model):
-    tag_id = models.CharField(unique=True)
+    tag_id = models.CharField(max_length=50, unique=True)
     name = models.CharField(max_length=50)
     email = models.EmailField(max_length=254, unique=True)
     credential = models.OneToOneField('Credential')
     plate = models.CharField(max_length=30)
     bank = models.CharField(max_length=30)
-    tel = models.CharField(max_length=23)
+    tel = models.CharField(max_length=50)
     registration_time = models.DateTimeField(auto_now_add=True)
     latest_modification = models.DateTimeField(auto_now=True)
 
