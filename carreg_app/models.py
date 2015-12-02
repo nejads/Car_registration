@@ -1,4 +1,5 @@
 from django.db import models
+import uuid
 from . import utils
 from django.contrib.auth.models import (
     BaseUserManager,
@@ -9,10 +10,11 @@ from django.contrib.auth.models import (
 class UserManager(BaseUserManager):
     def create_user(self, name=None, email=None, password=None, plate=None,
                     tag_id=None, bank=None, tel=None):
-        if (not email) or (not name) or (not plate) or (not bank) or (not tel)
-        or (not password) or (not tag_id):
+        if (not email) or (not name) or (not plate) or (not bank) or (
+                not tel) or (not password):
             raise ValueError('Some information missing')
 
+        tag_id = uuid.uuid4()
         user = self.model(
             name=name,
             email=self.normalize_email(email),
@@ -51,7 +53,7 @@ class User (AbstractBaseUser):
     objects = UserManager()
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['name', 'plate', 'bank', 'tel', 'tag_id']
+    REQUIRED_FIELDS = ['name', 'plate', 'bank', 'tel']
 
     def __str__(self):
         return ('id: {} tag_id: {} name: {} email: {}'

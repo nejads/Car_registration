@@ -1,19 +1,15 @@
-from django.shortcuts import render
-from rest_framework import generics, status
-from rest_framework.views import APIView
 from django.http import HttpResponse
+
+from rest_framework import generics, permissions, status, response, views
+from rest_framework.authtoken.models import Token
+from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.response import Response
+import djoser
+from djoser import views, signals, settings, serializers
 
-from . import utils
-from .serializers import *
-from .models import *
-import uuid
-
-from django.contrib.auth.hashers import (
-    make_password,
-    is_password_usable,
-    check_password,
-)
+# from carreg import settings
+from . import serializers, utils
 
 
 def index(request):
@@ -21,61 +17,22 @@ def index(request):
     return HttpResponse(html)
 
 
-class UserRegisteration(APIView):
-    def post(self, request, format=None):
+class UserRegisteration(djoser.views.RegistrationView):
 
-        password = request.data.get('password')
-        if not password:
-            return Response('Password required', status.HTTP_400_BAD_REQUEST)
+    serializer_class = serializers.UserRegistrationSerializer
+    permission_classes = (
+        permissions.AllowAny,
+    )
+    subject_template_name = 'activation_email_subject.txt'
+    plain_body_template_name = 'activation_email_body.txt'
 
-        sign_up_serializer = SignUpSerializer(data=request.data)
-        if not sign_up_serializer.is_valid():
-            return Response(sign_up_serializer.errors,
-                            status.HTTP_400_BAD_REQUEST)
-
-        tag_id = uuid.uuid4()
-
-        salt = utils.salt_gen()
-        encrypted_pass = make_password(password, salt=salt)
-        if not is_password_usable(encrypted_pass):
-            return Response('Encrypted password generation failed!',
-                            status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-        cred = Credential(salt=salt, encrypted_pass=encrypted_pass)
-        cred.save()
-
-        data = sign_up_serializer.data
-        data['tag_id'] = str(tag_id)
-        data['credential'] = cred.id
-        serializer = UserSerializer(data=data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status.HTTP_201_CREATED)
-
-
-class UserLogin(APIView):
-    def post(self, request, format=None):
-
-        email = request.data.get('email')
-        password = request.data.get('password')
-        if (not email) or (not password):
-            return Response('Credentials is missing',
-                            status.HTTP_400_BAD_REQUEST)
-
-        try:
-            user = User.objects.get(email=email)
-            cred = Credential.objects.get(pk=user.id)
-            encrypted_pass = cred.encrypted_pass
-            # This line is equalent to cred=... and encrypted_pass=...
-            # encrypted_pass = user.credential.encrypted_pass
-            if check_password(password, encrypted_pass):
-                return Response('Success', status.HTTP_200_OK)
-            else:
-                return Response('Failed', status.HTTP_403_FORBIDDEN)
-
-        except User.DoesNotExist:
-            user = None
-            return Response('User not found', status.HTTP_404_NOT_FOUND)
+    def perform_create(self, serializer):
+        instance = serializer.save()
+        instance.save()
+        signals.user_registered.send(sender=self.__class__, user=instance,
+                                     request=self.request)
+        if settings.get('SEND_ACTIVATION_EMAIL'):
+            self.send_email(**self.get_send_email_kwargs(instance))
 
 
 class UserRefuel(APIView):

@@ -7,9 +7,9 @@ urlpatterns = [
     url(r'^$', views.index, name='index'),
 
     # POST to this url implies registeration
-    url(r'^users/$', views.UserRegisteration.as_view(), name='user_register'),
-    url(r'^users/login/$', views.UserLogin.as_view(), name='user_login'),
-    url(r'^users/refuel/$', views.UserRefuel.as_view(), name='user_refuel'),
+    url(r'^users/register/', views.UserRegisteration.as_view()),
+    url(r'^users/(?P<user_id>[0-9]+)/refuel/$', views.UserRefuel.as_view(),
+        name='user_refuel'),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

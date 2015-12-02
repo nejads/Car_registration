@@ -2,7 +2,6 @@
 from __future__ import unicode_literals
 
 from django.db import models, migrations
-import carreg_app.utils
 
 
 class Migration(migrations.Migration):
@@ -12,17 +11,9 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='Credential',
-            fields=[
-                ('id', models.AutoField(primary_key=True, verbose_name='ID', serialize=False, auto_created=True)),
-                ('encrypted_pass', models.CharField(max_length=128)),
-                ('salt', models.CharField(max_length=50)),
-            ],
-        ),
-        migrations.CreateModel(
             name='Refuel',
             fields=[
-                ('id', models.AutoField(primary_key=True, verbose_name='ID', serialize=False, auto_created=True)),
+                ('id', models.AutoField(auto_created=True, serialize=False, verbose_name='ID', primary_key=True)),
                 ('line', models.CharField(max_length=23)),
                 ('consumption', models.PositiveIntegerField()),
                 ('refuel_time', models.DateTimeField(auto_now_add=True)),
@@ -31,21 +22,26 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='User',
             fields=[
-                ('id', models.AutoField(primary_key=True, verbose_name='ID', serialize=False, auto_created=True)),
-                ('tag_id', models.CharField(max_length=23, unique=True)),
+                ('id', models.AutoField(auto_created=True, serialize=False, verbose_name='ID', primary_key=True)),
+                ('password', models.CharField(verbose_name='password', max_length=128)),
+                ('last_login', models.DateTimeField(blank=True, null=True, verbose_name='last login')),
+                ('tag_id', models.CharField(unique=True, max_length=50)),
                 ('name', models.CharField(max_length=50)),
-                ('email', models.EmailField(max_length=254, unique=True)),
+                ('email', models.EmailField(unique=True, max_length=254)),
                 ('plate', models.CharField(max_length=30)),
                 ('bank', models.CharField(max_length=30)),
-                ('tel', models.CharField(validators=[carreg_app.utils.validate_phone], max_length=23)),
-                ('registration_time', models.DateTimeField(auto_now_add=True)),
-                ('latest_modification', models.DateTimeField(auto_now=True)),
-                ('credential', models.OneToOneField(to='carreg_app.Credential')),
+                ('tel', models.CharField(max_length=50)),
+                ('is_active', models.BooleanField(default=False)),
+                ('is_admin', models.BooleanField(default=False)),
+                ('date_joined', models.DateTimeField(auto_now_add=True)),
             ],
+            options={
+                'abstract': False,
+            },
         ),
         migrations.AddField(
             model_name='refuel',
             name='user',
-            field=models.ForeignKey(to='carreg_app.User', related_name='refuels'),
+            field=models.ForeignKey(related_name='refuels', to='carreg_app.User'),
         ),
     ]
