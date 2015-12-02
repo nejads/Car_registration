@@ -41,7 +41,9 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'carreg_app',
     'rest_framework',
+    'rest_framework.authtoken',
     'rest_framework_swagger',
+    'djoser',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -104,6 +106,13 @@ else:
     }
 
 
+# REST framwork setting
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+    ),
+}
+
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
 
@@ -130,3 +139,25 @@ STATICFILES_DIRS = (
 
 # Honor the 'X-Forwarded-Proto' header for request.is_secure()
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# Djoser setting
+DJOSER = {
+    'SEND_ACTIVATION_EMAIL': True,
+    'PASSWORD_RESET_CONFIRM_URL': '#/password/reset/confirm/{uid}/{token}',
+    'ACTIVATION_URL': '#/activate/{uid}/{token}',
+}
+
+# Email configuration
+##########################################
+# To be added when in production
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST_USER = 'testsemwear@gmail.com'
+EMAIL_HOST_PASSWORD = 'nexmtiuddbsrrdzc'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+##########################################
+# For testing
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# EMAIL_HOST = 'localhost'
+# EMAIL_PORT = 1025
