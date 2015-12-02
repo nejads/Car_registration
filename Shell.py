@@ -7,3 +7,6 @@ from carreg_app.models import User, Credential, Refuel
 user = User.objects.get(email="ali@gmail.com")
 cred = Credential.objects.get(pk=user.id)
 user
+
+
+DROP SCHEMA public CASCADE;CREATE SCHEMA public;
